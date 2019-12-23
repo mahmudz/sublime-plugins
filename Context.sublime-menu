@@ -1,7 +1,17 @@
 [
-    {"caption": "To Snake Case", "command": "snake_case"},
-    [
-    	{ "caption": "-", "id" : "file" },
-		{ "command": "asseting_source", "caption": "Convert Js/css Links To Asset Link" }
-    ]
+    { "caption": "-" },
+    {
+        "caption": "Laravel Actions",
+        "children": [
+            {
+                "caption": "Generate Translations",
+                "command": "generate_translations"
+            },
+            {
+                "caption": "Convert Js/css Links To Asset Link",
+                "command": "asseting_source"
+            },
+        ]
+    },
+    { "caption": "-" }
 ]

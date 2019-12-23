@@ -2,17 +2,28 @@ import sublime
 import sublime_plugin
 import re
 
-class SnakeCaseCommand(sublime_plugin.TextCommand):
-    def run(self, edit):
+class GenerateTranslationsCommand(sublime_plugin.TextCommand):
+    pattern = r'(trans(?:_choice)?|Lang::(?:get|choice|trans(?:Choice)?)|@(?:lang|choice)|(__))\(([\'"]([^\'"]+)[\'"])[)\]];?'
+
+    #__\(([\'"]([^\'"]+)[\'"])[)\]];?       :Extract transltion methods
+    # {{ __[^)]*
+    def run(self, view):
         selection = self.view.sel()
         for region in selection:
             selectionText = self.view.substr(region)
-            self.view.replace(edit, region, self.convert(selectionText))
+            match = re.findall(r'(trans(?:_choice)?|Lang::(?:get|choice|trans(?:Choice)?)|@(?:lang|choice)|(__))\(([\'"]([^\'"]+)[\'"])[)\]];?', selectionText)
+            translations = "" 
+            for x in match:
+                translations += '{0} => {1},\n'.format(x[3], x[3])
+            print(translations)
+    
+    def scan(self):
+        pass
 
-    def convert(self, text):
-        text = text.replace("'", '')
-        text = text.replace('"', '')
-        return re.sub(r'[\W_]+', '_', text).lower()
+    def export(self, text):
+        view = self.view.window().new_file()
+        view.run_command('requester_replace_view_text',
+                         {'text': text, 'point': 0})
 
 class TransCommand(sublime_plugin.TextCommand):
     def run(self, edit):
