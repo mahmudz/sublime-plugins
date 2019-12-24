@@ -4,7 +4,11 @@
         "caption": "Laravel Actions",
         "children": [
             {
-                "caption": "Generate Translations",
+                "caption": "To Translations",
+                "command": "trans"
+            },
+            {
+                "caption": "Generate Translations Array",
                 "command": "generate_translations"
             },
             {

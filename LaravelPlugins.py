@@ -1,29 +1,24 @@
 import sublime
 import sublime_plugin
 import re
+import json
 
 class GenerateTranslationsCommand(sublime_plugin.TextCommand):
     pattern = r'(trans(?:_choice)?|Lang::(?:get|choice|trans(?:Choice)?)|@(?:lang|choice)|(__))\(([\'"]([^\'"]+)[\'"])[)\]];?'
-
-    #__\(([\'"]([^\'"]+)[\'"])[)\]];?       :Extract transltion methods
-    # {{ __[^)]*
     def run(self, view):
         selection = self.view.sel()
+        translations = "" 
         for region in selection:
             selectionText = self.view.substr(region)
             match = re.findall(r'(trans(?:_choice)?|Lang::(?:get|choice|trans(?:Choice)?)|@(?:lang|choice)|(__))\(([\'"]([^\'"]+)[\'"])[)\]];?', selectionText)
-            translations = "" 
             for x in match:
-                translations += '{0} => {1},\n'.format(x[3], x[3])
-            print(translations)
-    
-    def scan(self):
-        pass
+                phrase = x[3].split('.')
+                translations += '{0} => {0},\n'.format(json.dumps(phrase[1]))
 
-    def export(self, text):
-        view = self.view.window().new_file()
-        view.run_command('requester_replace_view_text',
-                         {'text': text, 'point': 0})
+            view = self.view.window().new_file()
+            view.run_command('requester_replace_view_text',
+                             {'text': translations, 'point': 0})
+
 
 class TransCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -33,9 +28,8 @@ class TransCommand(sublime_plugin.TextCommand):
             self.view.replace(edit, region, self.convert(selectionText))
 
     def convert(self, text):
-        text = text.replace("'", '')
-        text = text.replace('"', '')
-        return "{{ __('translations." + re.sub(r'[\W_]+', '_', text).lower() + "') }}"
+        text = text.replace("'", "\\'")
+        return "{{ __('translations." + text + "') }}"
 
 
 class AssetingSourceCommand(sublime_plugin.TextCommand):
